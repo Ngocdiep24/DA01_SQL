@@ -41,3 +41,33 @@ LEFT JOIN page_likes
 on page_likes.page_id=pages.page_id
 where page_likes.liked_date is null
 ORDER BY page_id
+--bai tap 1:
+select distinct
+min(replacement_cost) as min_replacement_cost
+from public.film
+--bai tap 2:
+select
+case
+when replacement_cost between 9.99 and 19.99 then 'low'
+when replacement_cost between 20.00 and 24.99 then 'medium'
+else 'high'
+end as replacement,
+count('*') as so_luong
+from public.film
+group by replacement
+--bai tap 3:
+select a.name , max(length) as max_length
+from public.category as a
+inner join public.film_category as b on a.category_id=b.category_id
+inner join public.film as c on b.film_id=c.film_id
+where a.name in ('Drama', 'Sports')
+group by a.name
+--bai tap 4:
+select a.name,
+count(*) as category
+from public.category as a
+inner join public.film_category as b on a.category_id=b.category_id
+inner join public.film as c on b.film_id=c.film_id
+group by a.name
+order by category desc
+limit 1
