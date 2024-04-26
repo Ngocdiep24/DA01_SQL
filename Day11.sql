@@ -18,14 +18,14 @@ THEN ac.time_spent
 END)/sum(CASE 
 WHEN ac.activity_type in ('open','send')
 THEN ac.time_spent
-END)*100.0,2),
+END)*100.0,2) as send_perc,
 round(sum(CASE 
 WHEN ac.activity_type = 'open'
 THEN ac.time_spent
 END)/sum(CASE 
 WHEN ac.activity_type in ('open','send')
 THEN ac.time_spent
-END)*100.0,2)
+END)*100.0,2) as open_perc
 FROM activities as ac
 INNER JOIN age_breakdown AS age ON ac.user_id = age.user_id 
 GROUP BY age.age_bucket;
