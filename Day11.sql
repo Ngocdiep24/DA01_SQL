@@ -15,14 +15,14 @@ SELECT age.age_bucket,
 round(sum(CASE 
 WHEN ac.activity_type = 'send'
 THEN ac.time_spent
-END) :: DECIMAL /sum(CASE 
+END)/sum(CASE 
 WHEN ac.activity_type in ('open','send')
 THEN ac.time_spent
 END)*100.0,2),
 round(sum(CASE 
 WHEN ac.activity_type = 'open'
 THEN ac.time_spent
-END) :: DECIMAL /sum(CASE 
+END)/sum(CASE 
 WHEN ac.activity_type in ('open','send')
 THEN ac.time_spent
 END)*100.0,2)
