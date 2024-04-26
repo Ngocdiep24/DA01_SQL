@@ -71,3 +71,10 @@ inner join public.film as c on b.film_id=c.film_id
 group by a.name
 order by category desc
 limit 1
+--bai tap 5:
+select a.first_name, a.last_name, count(b.film_id) as so_luong from public.actor as a
+join public.film_actor as b on a.actor_id=b.actor_id
+group by a.first_name, a.last_name
+order by so_luong desc
+limit 1
+
