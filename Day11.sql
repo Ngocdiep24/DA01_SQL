@@ -10,6 +10,25 @@ ROUND(1.0*SUM(CASE WHEN signup_action = 'Confirmed' THEN 1 ELSE 0 END)/
 FROM emails
 inner join texts
 on emails.email_id=texts.email_id
+--ex3:
+SELECT age.age_bucket, 
+round(sum(CASE 
+WHEN ac.activity_type = 'send'
+THEN ac.time_spent
+END) :: DECIMAL /sum(CASE 
+WHEN ac.activity_type in ('open','send')
+THEN ac.time_spent
+END)*100.0,2),
+round(sum(CASE 
+WHEN ac.activity_type = 'open'
+THEN ac.time_spent
+END) :: DECIMAL /sum(CASE 
+WHEN ac.activity_type in ('open','send')
+THEN ac.time_spent
+END)*100.0,2)
+FROM activities as ac
+INNER JOIN age_breakdown AS age ON ac.user_id = age.user_id 
+GROUP BY age.age_bucket;
 --ex4:
 SELECT CUSTOMER_ID 
 FROM CUSTOMER_CONTRACTS 
@@ -77,4 +96,26 @@ join public.film_actor as b on a.actor_id=b.actor_id
 group by a.first_name, a.last_name
 order by so_luong desc
 limit 1
-
+--bai tap 6:
+select a.first_name, count(*) as so_luong from address as b
+left join customer as a on a.address_id=b.address_id
+where first_name is null
+group by first_name
+--bai tap 7:
+select d.city, sum(a.amount) as doanh_thu from payment as a
+join public.customer as b on a.customer_id=b.customer_id
+join public.address as c on b.address_id=c.address_id
+join public.city as d on c.city_id=d.city_id
+group by d.city
+order by doanh_thu desc
+limit 1
+--bai tap 8:
+select 
+e.country||', '||d.city as full_name, sum(a.amount) as doanh_thu from payment as a
+join public.customer as b on a.customer_id=b.customer_id
+join public.address as c on b.address_id=c.address_id
+join public.city as d on c.city_id=d.city_id
+join public.country as e on e.country_id=d.country_id
+group by d.city, e.country
+order by doanh_thu 
+limit 1
