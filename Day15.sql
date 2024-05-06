@@ -21,7 +21,7 @@ order by issued_amount DESC
 --ex3
 with cte AS
 (SELECT *,
-ROW_NUMBER() OVER (
+row_number() OVER (
 PARTITION BY user_id ORDER BY transaction_date) AS row
 FROM transactions)
 select 
