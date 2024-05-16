@@ -37,4 +37,47 @@ add column CONTACTFIRSTNAME varchar;
 alter table public.sales_dataset_rfm_prj
 alter column CONTACTLASTNAME TYPE text USING (CONTACTLASTNAME::text),
 alter column CONTACTFIRSTNAME TYPE text USING (CONTACTFIRSTNAME::text)
-
+--ex4
+with cte as
+(select ordernumber,
+case 
+when (extract(month from orderdate) in (1,2,3)) then 1
+when (extract(month from orderdate) in (4,5,6)) then 2
+when (extract(month from orderdate) in (7,8,9)) then 3
+else 4
+ end as QTR_ID,
+extract (month from orderdate) as MONTH_ID,
+extract (year from orderdate) as YEAR_ID
+from public.sales_dataset_rfm_prj)
+select * from public.sales_dataset_rfm_prj as a
+join cte as b
+on a.ordernumber=b.ordernumber
+--ex5
+--boxplot
+with cte as(
+select Q1*1.5-IQR as min_value,
+Q3*1.5-IQR as max_value
+from((select 
+percentile_cont (0.25) within group (order by QUANTITYORDERED) as Q1,
+percentile_cont (0.75) within group (order by QUANTITYORDERED) as Q3,
+percentile_cont (0.75) within group (order by QUANTITYORDERED) - percentile_cont (0.25) within group (order by QUANTITYORDERED) as IQR
+from public.sales_dataset_rfm_prj)) as a)
+select * from public.sales_dataset_rfm_prj
+where QUANTITYORDERED< (select min_value from cte)
+or QUANTITYORDERED> (select max_value from cte)
+--Z_score
+with cte as
+(select ordernumber, QUANTITYORDERED,
+(select avg (QUANTITYORDERED) from public.sales_dataset_rfm_prj) as avg,
+(select stddev (QUANTITYORDERED) from public.sales_dataset_rfm_prj) as stddev
+from public.sales_dataset_rfm_prj)
+select ordernumber, (QUANTITYORDERED-avg)/stddev as z_score
+from cte
+where abs((QUANTITYORDERED-avg)/stddev)>2
+--xu ly du lieu
+update public.sales_dataset_rfm_prj
+set QUANTITYORDERED= (select avg(QUANTITYORDERED) from public.sales_dataset_rfm_prj)
+where QUANTITYORDERED in (select QUANTITYORDERED from outlier)
+--ex6
+ALTER TABLE sales_dataset_rfm_prj
+  RENAME TO SALES_DATASET_RFM_PRJ_CLEAN
