@@ -40,16 +40,11 @@ alter column CONTACTFIRSTNAME TYPE text USING (CONTACTFIRSTNAME::text)
 --ex4
 with cte as
 (select ordernumber,
-case 
-when (extract(month from orderdate) in (1,2,3)) then 1
-when (extract(month from orderdate) in (4,5,6)) then 2
-when (extract(month from orderdate) in (7,8,9)) then 3
-else 4
- end as QTR_ID,
+extract (quarter from orderdate) as QTR_ID,
 extract (month from orderdate) as MONTH_ID,
 extract (year from orderdate) as YEAR_ID
-from public.sales_dataset_rfm_prj)
-select * from public.sales_dataset_rfm_prj as a
+from public.sales_dataset_rfm_prj_clean)
+select * from public.sales_dataset_rfm_prj_clean as a
 join cte as b
 on a.ordernumber=b.ordernumber
 --ex5
